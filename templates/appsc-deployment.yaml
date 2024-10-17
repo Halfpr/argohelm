@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-appsc
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-appsc
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-appsc
+    spec:
+      containers:
+      - name: appsc
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        command: ["/bin/run-cloud"]
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}-appsc-config
+        volumeMounts:
+        - name: appsc-data
+          mountPath: /opt/sce-data
+        - name: cacerts
+          mountPath: /usr/lib/jvm/axiomjdk-java17-amd64/lib/security/cacerts
+        ports:
+        - containerPort: {{ .Values.containerPort }}
+        resources:
+          requests:
+            cpu: "{{ .Values.resources.requests.cpu }}"
+            memory: "{{ .Values.resources.requests.memory }}"
+          limits:
+            cpu: "{{ .Values.resources.limits.cpu }}"
+            memory: "{{ .Values.resources.limits.memory }}"
+      volumes:
+      - name: appsc-secret
+        secret:
+          secretName: {{ .Release.Name }}-appsc-secret
+      - name: appsc-data
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-appsc-pvc
+      - name: cacerts
+        hostPath:
+          path: /opt/sce/cacerts

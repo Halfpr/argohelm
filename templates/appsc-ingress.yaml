@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-appsc-ingress
+  namespace: {{ .Release.Namespace }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  tls:
+  - hosts: 
+    - {{ .Values.host }}
+    secretName: {{ .Release.Name }}-appsc-secret
+  rules:
+  - host: {{ .Values.host }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: {{ .Release.Name }}-appsc
+            port:
+              number: {{ .Values.service.port }}
+#apiVersion: networking.k8s.io/v1
+#kind: Ingress
+#metadata:
+#  name: appsc-ingress
+#  namespace: 13zp
+#spec:
+#  ingressClassName: nginx
+#  tls:
+#  - hosts:
+#    - kubertest.secretgroup.dev
+#    secretName: zp-appsc-secret
+#  rules:
+#  - host: "kubertest.secretgroup.dev"
+#    http:
+#      paths:
+#        - pathType: Prefix
+#          path: "/"
+#          backend:
+#            service:
+#              name: zp-appsc
+#              port:
+#                number: 8443
