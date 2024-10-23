@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-psql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: psql
+  template:
+    metadata:
+      labels:
+        app: psql
+    spec:
+      containers:
+      - name: psql
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        env:
+        - name: POSTGRES_MAX_CONNECTIONS
+          value: "1000"
+        - name: POSTGRES_USER
+          value: "{{ .Values.psql.user }}"
+        - name: POSTGRES_PASSWORD_FILE
+          value: /run/secrets/psql
+        - name: POSTGRES_DB
+          value: "{{ .Values.psql.db }}"
+        - name: POSTGRES_INITDB_ARGS
+          value: "{{ .Values.psql.initdbArgs }}"
+        volumeMounts:
+        - name: psql-storage
+          mountPath: /var/lib/postgresql/data/
+        - name: psql-secret
+          mountPath: /run/secrets/psql
+          subPath: POSTGRES_PASSWORD
+        livenessProbe:
+          exec:
+            command: ["pg_isready", "-U", "{{ .Values.psql.user }}"]
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+      volumes:
+      - name: psql-storage
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-psql-pvc
+      - name: psql-secret
+        secret:
+          secretName: {{ .Release.Name }}-psql-secret
+      imagePullSecrets:
+      - name: {{ .Release.Name }}-psql-secret

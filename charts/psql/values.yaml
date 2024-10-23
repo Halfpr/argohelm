@@ -1,0 +1,29 @@
+image:
+  repository: registry.secret.su/common/postgres
+  tag: 16-alpine-v1
+psql:
+  user: storagedb
+  db: storagedb
+  initdbArgs: --auth-host=scram-sha-256 --auth-local=scram-sha-256
+  password: storagedb
+
+persistence:
+  storage: 10Gi
+  hostPath: /home/half/psqldata/
+
+livenessProbe:
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 5
+
+
+
+harbor:
+  dockerconfigjson: |
+    {
+      "auths": {
+        "registry.secret.su": {
+          "auth": "YW1yYWtob3Y6UXdlcnR5XzEyOTA="
+        }
+      }

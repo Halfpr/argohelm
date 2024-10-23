@@ -1,0 +1,91 @@
+replicaCount: 1
+containerPort: 8081
+
+image:
+#  repository: registry.secret.su/scloud_release/astra1.8_axiomjdk17
+  repository: registry.secret.su/scloud_release/u22lts_openjdk17
+  tag: v2024.2.0.2
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8443
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: kubertest.secretgroup.dev
+      paths:
+        - path: /
+          pathType: Prefix
+
+host: "kubertest.secretgroup.dev"
+
+
+resources:
+  requests:
+    cpu: "1000m"
+    memory: "1Gi"
+  limits:
+    cpu: "2000m"
+    memory: "8Gi"
+
+configMap:
+  data:
+    DIRECTION: "BIDIRECTIONAL"
+    MASTER: "true"
+    JAVA_OPTS: "-Dserver.tomcat.mbeanregistry.enabled=true -Dserver.tomcat.max-connections=2000 -Dserver.tomcat.max-threads=200 -Dserver.connection-timeout=1200000 -Djavamelody.enabled=false -Doauth2.general.token.access.expirationTime=14400 -Doauth2.general.token.refresh.expirationTime=144000 -Dspring.datasource.hikari.connection-timeout=120000 -Dlogging.level.com.zaxxer.hikari.HikariConfig=DEBUG -Dlogging.level.com.zaxxer.hikari=DEBUG"
+    SPRING_DATASOURCE_JDBC_HIKARI_URL: "jdbc:postgresql://{{ .Release.Name }}-psql:5432/storagedb?targetServerType=master&loginTimeout=10&connectTimeout=10&tcpKeepAlive=true"
+    SPRING_DATASOURCE_HIKARI_URL: "jdbc:postgresql://{{ .Release.Name }}-psql:5432/storagedb?targetServerType=master&loginTimeout=10&connectTimeout=10&tcpKeepAlive=true"
+#    SPRING_DATASOURCE_JDBC_HIKARI_URL: "jdbc:postgresql://{{ .Release.Name }}-psql:{{ .Values.psql.service.port }}/storagedb?targetServerType=master&loginTimeout=10&connectTimeout=10&tcpKeepAlive=true"
+#    SPRING_DATASOURCE_HIKARI_URL: "jdbc:postgresql://{{ .Release.Name }}-psql:{{ .Values.psql.service.port }}/storagedb?targetServerType=master&loginTimeout=10&connectTimeout=10&tcpKeepAlive=true"
+    CONTEX_PATH: "/storage"
+    PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    CATALINA_BASE: "/usr/local/sce"
+    LANGUAGE: "ru_RU.UTF-8"
+    LANG: "ru_RU.UTF-8"
+    LC_ALL: "ru_RU.UTF-8"
+    FILE_CONCAT_THREAD_COUNT: "6"
+    THREAD_POOL_COMMON_THREAD_COUNT: "12"
+    THREAD_POOL_COMMON_QUEUE_CAPACITY: "25000"
+    TOMCAT_COMMON_MAX_THREADS: "200"
+    UPLOAD_MAX_THREADS: "25"
+    LIQUIBASE_CONTEXTS: "init,prod"
+    HIKARI_MAX_POOL_SIZE: "100"
+
+persistentVolume:
+  capacity: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /opt/sce-data
+
+pvc:
+  name: appsc-pvc
+  namespace: 13zp
+  accessModes: ReadWriteOnce
+  storage: 10Gi
+
+secret:
+  data:
+    appsc-db.yml: c3ByaW5nOgogIGRhdGFzb3VyY2UuaGlrYXJpLnBhc3N3b3JkOiBzdG9yYWdlZGI=
+    tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQW02Z0F3SUJBZ0lRUnpXbEtYYVMvMHo1MWR1ZnY0VWl1akFLQmdncWhrak9QUVFEQWpCTU1Sd3cKR2dZRFZRUUtFeE5UWldOeVpYUWdWR1ZqYUc1dmJHOW5hV1Z6TVN3d0tnWURWUVFERXlOVFpXTnlaWFFnVkdWagphRzV2Ykc5bmFXVnpJRWx1ZEdWeWJXVmthV0YwWlNCRFFUQWVGdzB5TkRBNE1UVXlNVEEzTlRGYUZ3MHlOVEF5Ck1URXlNVEE0TlRGYU1BQXdnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFERlRDQ3MKSFdWc2RqUU5yenJvQ0VxM2pCKytEM045cm9vQ0xJZWJxT1JUVHJNUTlNLzhkSTN5VFMwN3g5Y3hpbWUwaUw3agprc3ZxalJBbVNZQm0zTnBmaG0rRllrczBPTG12RFVsSGVmZDJETUIrZVM5b0xuWHNIb0FxNnBURGdmUVNwaXJqCjRFVDQ4NnVlcGMraUo4Q1l3emZkaE83ZkQxcUpPeWlscUNVNGF2SmUvcjFCajN5dFIzMEsrbnlucGZ5Yldid2YKYkwzR1IrWjM1VnA5U1l4ZkNJR1VrSkVyVmdDbXBqQ2pIME1kdXJlQzFaSDUzbGR2TFZEUzVNQVdjS0JTR3RFTgo5MjIzSlREVDJVemZVbHBZaG0xRncxNzF1Rk5xak1lRHE1by80YTU4TDBKZ0Ztc0tsNks4NWlpdkxqbVlvV0ZUCmxSMys1YjVVMVJiTSt4KzNBZ01CQUFHamdiSXdnYTh3RGdZRFZSMFBBUUgvQkFRREFnV2dNQjBHQTFVZEpRUVcKTUJRR0NDc0dBUVVGQndNQkJnZ3JCZ0VGQlFjREFqQWRCZ05WSFE0RUZnUVVlekl3RjlBOVJYUkw4R3phK1JYSQpvQlNEakVRd0h3WURWUjBqQkJnd0ZvQVVDVzRHTG9sTi9mUWxpcXc4YVBHeW1yOWpTRUV3SHdZRFZSMFJBUUgvCkJCVXdFNElSS2k1elpXTnlaWFJuY205MWNDNWtaWFl3SFFZTUt3WUJCQUdDcEdUR0tFQUJCQTB3Q3dJQkJnUUUKWVdOdFpRUUFNQW9HQ0NxR1NNNDlCQU1DQTBnQU1FVUNJUUN5NUorMmVGU0V5SHFZdU9lWUNISVd6N2pzWXVoSApES0FPNDAwOGMvYkdoQUlnZVM0R0hYQzMySGZRMSs3SGN5Z0d0RWJUbE9PQzhaWVRET09kZDNnbmxycz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    tls.key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tDQpNSUlFdmdJQkFEQU5CZ2txaGtpRzl3MEJBUUVGQUFTQ0JLZ3dnZ1NrQWdFQUFvSUJBUURGVENDc0hXVnNkalFODQpyenJvQ0VxM2pCKytEM045cm9vQ0xJZWJxT1JUVHJNUTlNLzhkSTN5VFMwN3g5Y3hpbWUwaUw3amtzdnFqUkFtDQpTWUJtM05wZmhtK0ZZa3MwT0xtdkRVbEhlZmQyRE1CK2VTOW9MblhzSG9BcTZwVERnZlFTcGlyajRFVDQ4NnVlDQpwYytpSjhDWXd6ZmRoTzdmRDFxSk95aWxxQ1U0YXZKZS9yMUJqM3l0UjMwSytueW5wZnliV2J3ZmJMM0dSK1ozDQo1VnA5U1l4ZkNJR1VrSkVyVmdDbXBqQ2pIME1kdXJlQzFaSDUzbGR2TFZEUzVNQVdjS0JTR3RFTjkyMjNKVERUDQoyVXpmVWxwWWhtMUZ3MTcxdUZOcWpNZURxNW8vNGE1OEwwSmdGbXNLbDZLODVpaXZMam1Zb1dGVGxSMys1YjVVDQoxUmJNK3grM0FnTUJBQUVDZ2dFQVRnZEltS2xibG1TOU8zaEU1TVY2djFLMHJ4Y3ZSdEtEbEU2R0owTEpZa1VxDQp2cGNEdHNWbDZpRXB0WTNZaHFoRlVYb1BmTE51NEVsL3pKU2ZLbzlIOGlXWjczZXJaSERXeHV1TFFyQnk5UVlnDQpEeVRnWWVTV0VKY1RlMldoQmgxY0tRLzh3SGpPN21KNFNsc3JYZWM0M1hHL28yVlNqM2RrQ0FnVWtFZUt5TitZDQpmSHd1VUtBRVNDbHNsVS9RTjFDMkRlbUNTd0x4bnZXNjl3cFhtN3VoeWVHNkRTR0N4MkR4YlVkS3FoR1kwdzRTDQp0NExVMUpYeE5BWCtHRkFWVHdydHQrdGxVU2ZNbUpPM0J1QkdkalhIRDBKQ0VXTlI4S1l0cmUzdEhiT0xjY1BxDQpIZ1JhamNRWGRZd0pRS3JJZ2pveUh6S05xeDBPSkhWQTR1RjhRME54WVFLQmdRRDNWTi9IUkNvcHlFRW1pd0J4DQpncHNSVWsxMUpadEFIL3BkdnJxZFpyQ0x5WWpYaHhUNWhOT3R5Q3BCL1doTTlJOUNwaUZOck1IMFZGY212QTgvDQpjRW52SW1XQWJaZE5pc0NiV3lVSnN6Z0lVemR5MG1Da0trWGtQUVlLbk5uOTN1OVVIdmJjdnlBODBsa0w1d1NSDQo5TU16U0NmU09oVk4zT2NqdDhucXQ0WEZjUUtCZ1FETU5sVlYyT2c3eFY5REtkc2RHWVJhS3R2SGp2S2FGaE9ZDQp4b3dSdmg0b1p4VDVjZDNGR0dJRXFWSEVxQzVzakkvdnkxL25sUmlkd1J6WHJ0a1U2NUJXakIyYVljTzNsOE1LDQpjcTBlTjhqc0NBQjBHN2xnYmxpUU9aY0dSV2RRWDJtSGMvWlRHVFR5T0pERzdkeXRuMi91RjUzWkh0MTd0YXVmDQo0R1FHQ2xjRHB3S0JnUUMwME8vb2xnVGRGdkhLWThTbk4zeDJaVjBMVDdyNFhtaURNSFR0cmExVUJMcHVGdXRXDQpuNnpCVjV6Tk1aMlc1UlAyL2MxTEpBbUh2a0VZcUZQZFpSSW9LVlZiVnNOT2hTbmFhZi9oMzR3UFNnYzNnbVgwDQpucE1LRVRMaGYxby9KMFNBazBLV2o0UFo4MDMyVGFZaHJuY21mcEhlTjJocnpCdVBHVVljdXA2cGdRS0JnRWV6DQpzQ1RUWXo5Ulh0QnpTdGNkMVlYZlZJbnVIQ3FVSTg5WnIyYXZiV0ZjU0ZZSmNBZTdOdmRTQ0Q3WG1tMU1zV0ZODQo5RitZenlyYzJtYTBvczRnbys1dmhobGx5RldYT01sYldJT3FyS2FMYkxWWDRyQUVMcDU5U2hUT202Ynh5VmpoDQpFNVU3M1laSzdES2M1QVltWENPcU1TZENHaHhNdm5VRlVibDVPZkl6QW9HQkFJVmQrSDI3Zm82SDMydUdvWThYDQptU1VBeWRvNlZ0Z1BKc0NmWkxnZE9SeDdib3I0NW4zNW50MXliSzEvZEVEUitFV3FoTWxoQlo5akdJY0Y2ampJDQpiNGdaMkpWQjQ2Vkk2NGtoZDFtbmpoeUdwaHlUSFhJcWFEOEdIVThRR1Q5M0gxWUFHY283T1lRT0ZnMFEvMFBBDQpYV0w1a3NHamFBNUZXYzMvRktyOTVWaW4NCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0NCg==
+    server.port: ODA4MQ==
+
+
+psql:
+  service:
+    port: 5432
+
+
+harbor:
+  dockerconfigjson: |
+    {
+      "auths": {
+        "registry.secret.su": {
+          "auth": "YW1yYWtob3Y6UXdlcnR5XzEyOTA="
+        }
+      }

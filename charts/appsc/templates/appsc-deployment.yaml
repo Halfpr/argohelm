@@ -16,6 +16,11 @@ spec:
       containers:
       - name: appsc
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        env:
+        - name: SPRING_DATASOURCE_JDBC_HIKARI_URL
+          value: "jdbc:postgresql://{{ .Release.Name }}-psql:5432/storagedb?targetServerType=master&loginTimeout=10&connectTimeout=10&tcpKeepAlive=true"
+        - name: SPRING_DATASOURCE_HIKARI_URL
+          value: "jdbc:postgresql://{{ .Release.Name }}-psql:5432/storagedb?targetServerType=master&loginTimeout=10&connectTimeout=10&tcpKeepAlive=true"
         command: ["/bin/run-cloud"]
         envFrom:
         - configMapRef:
@@ -44,3 +49,5 @@ spec:
       - name: cacerts
         hostPath:
           path: /opt/sce/cacerts
+      imagePullSecrets:
+      - name: {{ .Release.Name }}-appsc-secret

@@ -1,14 +1,8 @@
 apiVersion: v2
-name: half
+name: psql
 description: A Helm chart for Kubernetes
 type: application
 #version: 0.1.0
 #appVersion: "1.16.0"
 version: 0.1.1
 appVersion: "latest"
-
-dependencies:
-  - name: appsc
-    version: 0.1.1
-  - name: psql
-    version: 0.1.1
