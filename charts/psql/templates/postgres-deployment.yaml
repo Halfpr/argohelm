@@ -12,6 +12,13 @@ spec:
       labels:
         app: psql
     spec:
+      initContainers:
+      - name: init-psql
+        image: busybox
+        command: ['sh', '-c', 'if [ ! -d "/var/lib/postgresql/data/PG_VERSION" ]; then echo "Database not initialized"; else echo "Database already initialized"; fi']
+        volumeMounts:
+        - name: psql-storage
+          mountPath: /var/lib/postgresql/data/
       containers:
       - name: psql
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
