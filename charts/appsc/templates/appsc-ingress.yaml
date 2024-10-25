@@ -3,6 +3,8 @@ kind: Ingress
 metadata:
   name: {{ .Release.Name }}-appsc-ingress
   namespace: {{ .Release.Namespace }}
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "1000m"
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   tls:
