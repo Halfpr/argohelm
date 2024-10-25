@@ -1,4 +1,4 @@
-replicaCount: 4
+replicaCount: 1
 containerPort: 8081
 
 image:
