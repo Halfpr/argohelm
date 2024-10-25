@@ -6,6 +6,7 @@ spec:
   capacity:
     storage: {{ .Values.persistence.storage }}
   accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "{{ .Values.persistence.hostPath }}"
+    - ReadWriteMany
+  nfs:
+    path: /mnt/vg01-lv01/psql-data
+    server: 192.168.60.234

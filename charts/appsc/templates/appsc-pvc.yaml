@@ -2,10 +2,9 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ .Release.Name }}-appsc-pvc
-  namespace: {{ .Values.pvc.namespace }}
 spec:
   accessModes:
-    - {{ .Values.pvc.accessModes }}
+    - ReadWriteMany
   resources:
     requests:
-      storage: {{ .Values.pvc.storage }}
+      storage: {{ .Values.persistence.storage }}
