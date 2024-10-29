@@ -8,7 +8,7 @@ version: 0.1.1
 appVersion: "latest"
 
 dependencies:
-  - name: appsc
-    version: 0.1.1
   - name: psql
+    version: 0.1.1
+  - name: appsc
     version: 0.1.1
