@@ -14,11 +14,12 @@ sdc           8:32   0   25G  0 disk
 Для этого устанавливаете сам helm. ./kuber Это просто папка где лежат чарты.
 5. Псоле запуска, Pod базы может падать, потому что max_connections там 100. Для этого нужно проделать следующее:
 Шаги
-1. kubectl get pods
+
+kubectl get pods
 Подключитесь к Pod-у
 
 kubectl exec -it zp-psql-7b98649c6d-9r22x -- /bin/sh
-2. Измените конфигурационный файл PostgreSQL
+Измените конфигурационный файл PostgreSQL
 После подключения к Pod-у, отредактируйте конфигурационный файл postgresql.conf. Обычно он находится в директории /var/lib/postgresql/data/.
 
 
@@ -26,7 +27,7 @@ vi /var/lib/postgresql/data/postgresql.conf
 Найдите строку с max_connections и измените её значение на 1000.:
 
 max_connections = 1000
-3. Перезапустите PostgreSQL
+Перезапустите PostgreSQL
 После изменения конфигурационного файла, перезапустите PostgreSQL. В зависимости от того, как PostgreSQL запущен внутри контейнера, это может быть сделано разными способами. Один из способов — перезапустить контейнер:
 
 kubectl rollout restart deployment zp-psql
