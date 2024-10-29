@@ -15,21 +15,21 @@ sdc           8:32   0   25G  0 disk
 5. Псоле запуска, Pod базы может падать, потому что max_connections там 100. Для этого нужно проделать следующее:
 Шаги
 
-kubectl get pods
-Подключитесь к Pod-у
+#kubectl get pods
+#Подключитесь к Pod-у
 
-kubectl exec -it zp-psql-7b98649c6d-9r22x -- /bin/sh
-Измените конфигурационный файл PostgreSQL
-После подключения к Pod-у, отредактируйте конфигурационный файл postgresql.conf. Обычно он находится в директории /var/lib/postgresql/data/.
+#kubectl exec -it zp-psql-7b98649c6d-9r22x -- /bin/sh
+#Измените конфигурационный файл PostgreSQL
+#После подключения к Pod-у, отредактируйте конфигурационный файл postgresql.conf. Обычно он находится в директории /var/lib/postgresql/data/.
 
 
-vi /var/lib/postgresql/data/postgresql.conf
-Найдите строку с max_connections и измените её значение на 1000.:
+#vi /var/lib/postgresql/data/postgresql.conf
+#Найдите строку с max_connections и измените её значение на 1000.:
 
-max_connections = 1000
-Перезапустите PostgreSQL
-После изменения конфигурационного файла, перезапустите PostgreSQL. В зависимости от того, как PostgreSQL запущен внутри контейнера, это может быть сделано разными способами. Один из способов — перезапустить контейнер:
+#max_connections = 1000
+#Перезапустите PostgreSQL
+#После изменения конфигурационного файла, перезапустите PostgreSQL. В зависимости от того, как PostgreSQL запущен внутри контейнера, это может быть сделано разными способами. Один из способов — перезапустить контейнер:
 
-kubectl rollout restart deployment zp-psql
+#kubectl rollout restart deployment zp-psql
 
-Ждёте минуту и всё должно заработать =D
+#Ждёте минуту и всё должно заработать =D
