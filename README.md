@@ -22,5 +22,5 @@ sdc           8:32   0   25G  0 disk
 9. После подключения к Pod-у, отредактируйте конфигурационный файл postgresql.conf. Обычно он находится в директории /var/lib/postgresql/data/.
 10. vi /var/lib/postgresql/data/postgresql.conf
 11. Найдите строку с max_connections и измените её значение на 1000.: max_connections = 1000
-12. После изменения конфигурационного файла, перезапустите PostgreSQL. В зависимости от того, как PostgreSQL запущен внутри контейнера, это может быть сделано разными способами. Один из способов — перезапустить контейнер: kubectl rollout restart deployment zp-psql
+12. После изменения конфигурационного файла, перезапустите PostgreSQL. Один из способов — перезапустить контейнер: kubectl rollout restart deployment zp-psql
 13. Ждёте минуту и всё должно заработать =D
