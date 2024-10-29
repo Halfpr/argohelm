@@ -8,6 +8,7 @@
 ----
 sdb           8:16   0   25G  0 disk 
 └─vg01-lv01 253:0    0   25G  0 lvm  /mnt/vg01-lv01     - это для базы
+
 sdc           8:32   0   25G  0 disk 
 └─vg02-lv02 253:1    0   25G  0 lvm  /opt/sce-data      - это для файлов
 
