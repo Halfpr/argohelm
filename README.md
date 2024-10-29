@@ -25,3 +25,10 @@ sdc           8:32   0   25G  0 disk
 11. Найдите строку с max_connections и измените её значение на 1000.: max_connections = 1000
 12. После изменения конфигурационного файла, перезапустите PostgreSQL. Один из способов — перезапустить контейнер: kubectl rollout restart deployment zp-psql
 13. Ждёте минуту и всё должно заработать =D
+---
+если под postgres не хочет запускаться со втрой или тртьей попытки, то меняйте местами psql и appsc в главном чарте.
+P.S dependencies:
+  - name: psql
+    version: 0.1.1
+  - name: appsc
+    version: 0.1.1
