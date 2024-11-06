@@ -2,9 +2,9 @@ replicaCount: 1
 containerPort: 8081
 
 image:
-#  repository: registry.secret.su/scloud_release/astra1.8_axiomjdk17
-  repository: registry.secret.su/scloud_release/u22lts_openjdk17
-  tag: v2024.2.0.2
+  repository: registry.secret.su/scloud_release/astra1.8_axiomjdk17
+ # repository: registry.secret.su/scloud_release/u22lts_openjdk17
+  tag: v2024.2.0.4
   pullPolicy: IfNotPresent
 
 service:
