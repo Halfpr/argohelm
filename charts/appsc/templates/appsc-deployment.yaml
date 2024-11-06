@@ -28,8 +28,8 @@ spec:
         volumeMounts:
         - name: appsc-data
           mountPath: /opt/sce-data
-        - name: cacerts
-          mountPath: /usr/lib/jvm/axiomjdk-java17-amd64/lib/security/cacerts
+  #      - name: cacerts
+ #         mountPath: /usr/lib/jvm/axiomjdk-java17-amd64/lib/security/cacerts
         ports:
         - containerPort: {{ .Values.containerPort }}
         resources:
