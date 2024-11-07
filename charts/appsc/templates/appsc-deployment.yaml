@@ -4,7 +4,7 @@ metadata:
   name: {{ .Release.Name }}-appsc
   namespace: {{ .Release.Namespace }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+ # replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: {{ .Release.Name }}-appsc
