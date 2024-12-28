@@ -23,8 +23,8 @@ spec:
       - name: psql
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         env:
-        - name: POSTGRES_MAX_CONNECTIONS
-          value: "1000"
+#        - name: POSTGRES_MAX_CONNECTIONS
+#          value: "1000"
         - name: POSTGRES_USER
           value: "{{ .Values.psql.user }}"
         - name: POSTGRES_PASSWORD_FILE
@@ -39,6 +39,9 @@ spec:
         - name: psql-secret
           mountPath: /run/secrets/psql
           subPath: POSTGRES_PASSWORD
+        - name: psql-config
+          mountPath: /var/lib/postgresql/data/postgresql.conf
+          subPath: postgresql.conf          
         livenessProbe:
           exec:
             command: ["pg_isready", "-U", "{{ .Values.psql.user }}"]
