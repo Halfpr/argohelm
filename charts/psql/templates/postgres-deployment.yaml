@@ -38,10 +38,7 @@ spec:
           mountPath: /var/lib/postgresql/data/
         - name: psql-secret
           mountPath: /run/secrets/psql
-          subPath: POSTGRES_PASSWORD
-        - name: psql-config
-          mountPath: /var/lib/postgresql/data/postgresql.conf
-          subPath: postgresql.conf          
+          subPath: POSTGRES_PASSWORD       
         livenessProbe:
           exec:
             command: ["pg_isready", "-U", "{{ .Values.psql.user }}"]
